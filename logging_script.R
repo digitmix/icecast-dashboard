@@ -17,44 +17,34 @@ storiesDb<-dbConnect(RMariaDB::MariaDB(),default.file=rmariadb.settingsfile,grou
 #show tables in database, confirm db connection
 dbListTables(storiesDb)
 
-#load json
-
-flag <- FALSE
-
-#read_stats = function() {
-
 while(TRUE){
-  
+
+flag <- FALSE    
 result <- fromJSON(file = json_url)
   
 for (n in result$icestats$source) {
   if(n$server_name != "Nowe Radio"){
     next
   }
-  if(n$server_name == "Nowe Radio"){
-    listeners <- n$listeners
-    flag <- TRUE
+  listeners <- n$listeners
+  flag <- TRUE
 
-    
-    query<-paste("INSERT INTO rdaszbord2 (listeners) VALUES('",as.character(listeners),"');")
+  query<-paste("INSERT INTO rdaszbord2 (listeners) VALUES('",as.character(listeners),"');")
 
-    rsInsert <- dbSendQuery(storiesDb, query)
-    dbClearResult(rsInsert)
+  rsInsert <- dbSendQuery(storiesDb, query)
+  dbClearResult(rsInsert)
     
-    break
+  break
   }
-}
 
 if (flag==FALSE){
   paste("Server", radioname, " not found")
 } else {
   #paste("Server", radioname, " found")
 }
+
 Sys.sleep(10)
-  #later::later(read_stats, 10)
-#}
-#read_stats()
+
 }
 
-#dbClearResult(rsInsert)
 dbDisconnect(storiesDb)
